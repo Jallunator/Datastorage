@@ -1,0 +1,75 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   reservation.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/05 13:51:22 by Alex P            #+#    #+#             */
+/*   Updated: 2023/09/05 15:15:20 by Alex P           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../hed.h"
+
+int timeswindow(void);
+
+
+
+int main(void)
+{
+
+    timeswindow();
+    
+
+
+    return 0;
+}
+
+int timeswindow(void) {
+    /* START OF NCURSES */
+    initscr();
+    noecho();
+    cbreak();
+    curs_set(0); // Hides cursor
+
+    // COLORS
+    use_default_colors();
+
+    // Get screen size
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);
+
+    // Create timewindow
+    WINDOW *timewin = newwin(30, xMax, 0, 0); // Keep the window at the top
+    box(timewin, 0, 0);
+
+    // Set window background colors to default
+    wbkgd(timewin, COLOR_PAIR(0));
+
+    refresh();
+    wrefresh(timewin);
+
+    // SHOW CHOICES at a fixed y-coordinate in the window
+    int y = 10; // Adjust this value to set the desired y-coordinate
+    char *choices[6] = {"Q: Quit", "k: Up", "j: Down", "h: Left", "l: Right"};
+    
+    for (int i = 0; i < 5; i++) {
+        mvwprintw(timewin, y, 2, "%s", choices[i]);
+        y++; // Increment the y-coordinate to print the next choice
+    }
+
+    wrefresh(timewin); // Refresh the window to show changes
+
+    int choice;
+    while (1) {
+        choice = wgetch(timewin);
+        if (choice == 'Q' || choice == 'q') {
+            break; // Exit the loop on 'Q' or 'q'
+        }
+    }
+
+    endwin();
+    return choice;
+}
+

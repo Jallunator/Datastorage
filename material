@@ -1,0 +1,122 @@
+/* ************************************************************************** */
+
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/04 15:46:41 by Alex P            #+#    #+#             */
+/*   Updated: 2023/09/04 19:15:12 by Alex P           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../hed.h"
+
+int main(void)
+{
+
+    int ch;
+
+    /*  START OF NCURSES  */
+    initscr();
+    noecho();
+    cbreak();  
+    curs_set(0); //Hides cursos
+
+    //COLORS
+    start_color();
+    //init_pair(1, COLOR_RED, COLOR_WHITE);  Punainen teksti, musta tausta   */
+
+
+    // Get screen size
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);
+
+
+    //Create menuwindow
+    WINDOW * menuwin = newwin(25, 40, yMax - yMax, xMax / 2 - 40);     /* (height, width, starty, startx)  */
+    box(menuwin, 0, 0);
+
+    //HEADER
+    mvwprintw(menuwin, 1, 40 / 2 - 9  ,"*_______________*");
+    mvwprintw(menuwin, 2, 40 / 2 - 9  ,"|               |");
+    mvwprintw(menuwin, 3, 40 / 2 - 9  ,"|  RESERVATION  |");
+    mvwprintw(menuwin, 4, 40 / 2 - 9  ,"|               |");
+    mvwprintw(menuwin, 5, 40 / 2 - 9  ,"*---------------*");
+    refresh();
+    wrefresh(menuwin);
+
+
+    
+
+    //SHOW CHOICES 
+    keypad(menuwin, TRUE); 
+    char    *choices[12] = {"Check times","-----------","            ","About us","--------  ","           ", "Help", "----     ","          ", "Exit", "----   ","           "};
+    int     choice;
+    int highlight = 0;
+
+    while (1)
+    {
+        for (int i = 0 ; i < 12 ; i++ )
+        {
+            if (i == highlight)
+                wattron(menuwin, A_REVERSE );
+
+            mvwprintw(menuwin, 8 + i , 50 / 2 - strlen(choices[i]),"%s", choices[i]);
+            wattroff(menuwin, A_REVERSE);
+            
+        }
+        choice = wgetch(menuwin);
+
+        switch(choice)
+        {
+            case KEY_UP:
+            {
+                if (highlight == 0)
+                    break;
+                highlight -= 3;
+                break;
+            }
+            case KEY_DOWN:
+            {
+                if (highlight == 9)
+                    break;
+                highlight += 3;
+                break;
+            }
+            default:
+                break;
+        }
+        if (choice == 10)
+            break;
+    }
+
+    //1.checktime 3.aboutus 6.Help 9.Exit 
+    switch(highlight)
+    {
+
+
+
+
+        case 9:
+        {
+            endwin();
+            exit(EXIT_SUCCESS);
+        }
+    }
+
+
+
+    refresh();
+    //Make sure that prog waits before exiting...
+    getch();
+    endwin();
+
+
+    /* END OF NCURSES */
+
+
+
+        return 0;
+}

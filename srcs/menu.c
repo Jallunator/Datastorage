@@ -6,11 +6,11 @@
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 04:45:24 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/05 17:57:30 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/07 13:54:33 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../hed.h"
+#include "hed.h"
 
 // Main menufunction calls others
 void menuwin(void)
@@ -34,13 +34,13 @@ WINDOW *createmenuwin(void)
     initscr();
     noecho();
     cbreak();  
-    curs_set(0); //Hides cursos
+    curs_set(0);
 
     //COLORS
     use_default_colors();  
     start_color();
-    init_pair(1, COLOR_CYAN,  COLOR_BLACK);  //Musta teksti, valkoinen tausta   
-
+    init_pair(1, COLOR_CYAN,  COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
 
     // Get screen size
     int yMax, xMax;
@@ -48,20 +48,20 @@ WINDOW *createmenuwin(void)
 
     
     //Create menuwindow
-    WINDOW * menuwin = newwin(25, 40, yMax - yMax, xMax / 2 - 40);     /* (height, width, starty, startx)  */
+    WINDOW * menuwin = newwin(25, 40, yMax - yMax, xMax / 2 - 20);     /* (height, width, starty, startx)  */
     box(menuwin, 0, 0);
     
     //Set window backround colors to 1 pair.
-    wbkgd(menuwin, COLOR_PAIR(1));
+    wbkgd(menuwin, COLOR_PAIR(2));
 
     //HEADER
-    wattron(menuwin, COLOR_PAIR(1));
+    wattron(menuwin, COLOR_PAIR(2));
     mvwprintw(menuwin, 1, 40 / 2 - 8  ,"*_______________*");
     mvwprintw(menuwin, 2, 40 / 2 - 8  ,"|               |");
-    mvwprintw(menuwin, 3, 40 / 2 - 8  ,"|  RESERVATION  |");
+    mvwprintw(menuwin, 3, 40 / 2 - 8  ,"|   MAIN MENU   |");
     mvwprintw(menuwin, 4, 40 / 2 - 8  ,"|               |");
     mvwprintw(menuwin, 5, 40 / 2 - 8  ,"*---------------*");
-    wattroff(menuwin, COLOR_PAIR(1));
+    wattroff(menuwin, COLOR_PAIR(2));
 
     refresh();
     wrefresh(menuwin);
@@ -69,12 +69,11 @@ WINDOW *createmenuwin(void)
     return (menuwin);
 }
 
-
 //Creates Choices in menu
 int menuchoices(WINDOW *menuwin)
 {
     keypad(menuwin, TRUE); 
-    char    *choices[12] = {"Check times","-----------","      ","About us"," --------  ","           ", "Help", " ----  ","   ", "Exit", "  ----   ","   "};
+    char    *choices[12] = {"Reservation","-----------","      ","About us"," --------  ","           ", "Help", " ----  ","   ", "Exit", "  ----   ","   "};
     int     choice;
     int highlight = 0;
 
@@ -129,25 +128,25 @@ void checkchoices(int choice)
         // use time() func to free times in time and others
         case 0:
         {
-            //delwin(menuwin);
-            //endwin();
-            refresh();
-            timeswindow(); // Here starts the reservation program. 
-
+            int x = reservationwindow(); // Here starts the reservation program. 
+            endwin();
+            exit(EXIT_SUCCESS);
         }
         
         //Creates about us window do last 
         case 3:{
-
+            endwin();
+            exit(EXIT_SUCCESS);
         }
         
 
 
         //Help window more like a manual
         case 6:{
-
-        
-
+            
+            endwin();
+            createhelpwin();
+            exit(EXIT_SUCCESS);
 
         }
     

@@ -6,7 +6,7 @@
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 03:35:07 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/05 18:49:16 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/07 21:38:03 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,30 @@ typedef struct customer
 
 }customer;
 
+//MAIN MENU
 void		menuwin(void);
 void		checkchoices(int choice);
 int			menuchoices(WINDOW *menuwin);
-int			timeswindow(void);
 WINDOW		*createmenuwin(void);
+
+
+//HELP
+void		createhelpwin(void);
+
+
+//RESERVATION
+int			reservationwindow(void);
+WINDOW *createmainwin(int *xMax, int *yMax);
+int mainloop(WINDOW *timewin,WINDOW *notesubwin, int xMax);
+
+void updateTimeDisplay(WINDOW *timewin);
+void helpbar(WINDOW *timewin);
+
+
+WINDOW *subwincalendar(WINDOW* parent, int xMax, int yMax, int *calwidth);
+WINDOW *subwinmiddle(WINDOW* parent, int xMax, int yMax, int calendarwidth);
+WINDOW *subwinnote(WINDOW* parent, int xMax, int yMax);
+
+
 
 #endif

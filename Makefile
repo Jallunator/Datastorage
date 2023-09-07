@@ -1,9 +1,15 @@
 FLAGS = -Wall -Wextra -Werror
-SRCS = $(wildcard srcs/*.c)
+SRCS = $(wildcard srcs/*.c srcs/reservation/*.c)
 OBJ  = $(SRCS:.c=.o)
+TARGET = exe
 
-all: $(OBJ)
-	gcc $(FLAGS) -o exe $^ -lncurses hed.h
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	gcc $(FLAGS) -o $@ $^ -lncurses
+
+%.o: %.c
+	gcc -c $< -o $@ -lncurses -I includes
 
 clean:
 	rm -f $(OBJ)

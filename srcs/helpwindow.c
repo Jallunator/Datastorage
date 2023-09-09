@@ -6,15 +6,37 @@
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/07 11:39:20 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/07 13:15:12 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/08 16:07:01 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "hed.h"
 
+int helpmainloop(WINDOW *helpwin, int xMax, int yMax)
+{
+    int ch;
+
+    while (1)
+    {
+        ch = wgetch(helpwin);
+
+        if (ch == 'q' || ch == 'Q'){
+            endwin();
+            exit(EXIT_SUCCESS);
+        }
+        else if (ch == 'm' || ch == 'M'){
+            return 2;
+        }
+
+
+    }
+    return 0;
+    
+}
+
 void createhelpwin(void) {
     
-    int yMax, xMax;
+    int yMax, xMax, ret = 0;
     initscr();
     noecho();
     cbreak();
@@ -36,11 +58,14 @@ void createhelpwin(void) {
     wattroff(helpwin, COLOR_PAIR(1));
     
     
-
-    char ch = wgetch(helpwin);
+    ret = helpmainloop(helpwin, xMax, yMax);
+    
     refresh();
     wrefresh(helpwin);
     endwin();
+    if (ret == 2){
+        menuwin();   //M goes back to menu.
+    }
 
 }
 

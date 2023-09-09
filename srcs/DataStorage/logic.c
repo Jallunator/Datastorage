@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mainw.c                                            :+:      :+:    :+:   */
+/*   logic.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 12:50:54 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/07 23:59:37 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/09 03:31:27 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,73 +47,73 @@ void helpbar(WINDOW *timewin) {
 /*****************BOTTOM BAR END **/
 
 
-
-WINDOW *createmainwin(int *xMax, int *yMax) {
-    initscr();
-    noecho();
-    cbreak();
-    curs_set(0);
-
-    // COLORS
-    use_default_colors();
-    start_color();
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-
-    // Get screen size
-    getmaxyx(stdscr, *yMax, *xMax);
-
-    // Create timewindow
-    char *companyname = "[ COMPANY NAME ]";
-    WINDOW *timewin = newwin(35, *xMax, 0, 0); // (Height, Width, Startx, Starty)
-    wattron(timewin, COLOR_PAIR(1));
-    box(timewin, 0, 0);
-    mvwprintw(timewin, 0, *xMax / 2 - strlen(companyname),"%s", companyname);
-    wbkgd(timewin, COLOR_PAIR(1)); // Set window background color to default.
-    wattroff(timewin, COLOR_PAIR(1));
-
-    refresh();
-    wrefresh(timewin);
-
-    return timewin;
-}
-
-
-
-
-
-
-//HERE MAKE A SUBWINDOW WHERE WRITED AND PRINT IT TO BOARD.
+// NOTEPAD ******************************************
 void writenote(WINDOW *notewin)
 {
     int yMax, xMax;
-    int x = 1;
-    int y = 1;
-    int i = 0;
+    static int x = 4;
+    static int y = 2;
+    static int i = 0;
     int ch;
     getmaxyx(notewin,yMax,xMax);
+    keypad(notewin, TRUE); //Enabling specialkeys
+    char *exitmsg = "Enter to exit write mode";
+    mvwprintw(notewin, 1, xMax - strlen(exitmsg) - 2,"%s", exitmsg);
     echo();
-    
-    while (i < xMax * yMax - 1){
 
-    ch = mvwgetch(notewin, y, x);
-   
-    if (x == xMax - 2){
-        x = 1;
-        y++;
-        continue;
+    while (i < xMax * ((yMax / 2) ) - 10){
+        ch = mvwgetch(notewin, y, x);
+        if (x == 4)mvwaddch(notewin, y, x - 2, '+'); 
+        if (ch == KEY_BACKSPACE || ch == 127) {
+            
+            if (x >= 4) {
+                if (x == 4 && y > 2){
+                    y -=2;
+                    x = xMax - 1;
+                }
+                
+                if (x == 4 && y == 2)continue;
+
+                mvwaddch(notewin, y, x - 1, ' ');
+                x--;
+                wrefresh(notewin);
+            }
+
+        } 
+        else if (ch == '\n'){
+            break;  // Exit loop when Enter key is pressed
+        } 
+        else{
+            
+            mvwaddch(notewin, y, x, ch);
+            x++;
+            
+            if (x >= xMax - 3) {
+                x = 4;
+                y += 2;
+            }
+            wrefresh(notewin);
+        }
+        i++;
     }
-    x++;
-    i++;
-    };
-
+    mvwprintw(notewin, 1, xMax - strlen(exitmsg) - 2,"                        ");
+    noecho();
+    keypad(notewin, FALSE);
 }
+// *************************************************************
 
 
-void handleChoice(WINDOW *timewin, WINDOW *notesubwin, int highlight) {
+
+// MOVEMENT / LOGIC ***********************************************
+
+// CHOICES
+int handleChoice(WINDOW *timewin, WINDOW *notesubwin,WINDOW *datawindow, int highlight) {
     
     switch (highlight) {
         case 0:
+            int x = storedata(datawindow, timewin);      // Here starts the datastoring part.
+            if (x) return x;
+            break;
         case 1:
         case 2:
             break;
@@ -124,9 +124,11 @@ void handleChoice(WINDOW *timewin, WINDOW *notesubwin, int highlight) {
             wrefresh(notesubwin);
             break;
     }
+    return 0;
 }
 
 void handleMovement(int *highlight, int move, int *ret) {
+    
     switch (move) {
         //MOVEMENT
         case KEY_RIGHT:
@@ -161,53 +163,60 @@ void handleMovement(int *highlight, int move, int *ret) {
 
     }
 
+
 }
+// ****************************************
 
 
-int mainloop(WINDOW *timewin,WINDOW *notesubwin,int xMax)
+
+int app_mainloop(WINDOW *timewin,WINDOW *notesubwin,WINDOW *storedata,int xMax)
 {
     helpbar(timewin);
     keypad(timewin, TRUE);
-
     nodelay(timewin, TRUE);     /* Makes getch non blocking so time can be updated. Multithreading not possible in curses*/ 
     timeout(1000);
     int move;
-    int x = 0;
+    int x;
     int ret = 0;
     int highlight = 0;
-    char *choices[4] = {"[ Make appointment ]", "[ Do something ]", "[ Leave review ]", "[ Write notification ]"};
+    char *choices[4] = {"[ Store data ]", "[ Search data ]", "[ Leave review ]", "[ Write notification ]"};
 
     while (1) {
         move = wgetch(timewin); 
         for (int i = 0 ; i < 4 ; i++){
             if (i == highlight){
-                wattron(timewin, A_REVERSE);}
-
-            
+                wattron(timewin, A_REVERSE);
+            }
+            x = i * 54 + 24;
             wattron(timewin, COLOR_PAIR(1));
-            x =  i * 47 + 18;   // Position calc for choices
             mvwprintw(timewin, 29, x,"%s", choices[i]);
             wattroff(timewin, COLOR_PAIR(1));
             
             wattroff(timewin, A_REVERSE);
         }
-        
         handleMovement(&highlight, move, &ret);        
         updateTimeDisplay(timewin);
 
         if (ret) return ret; // Q OR M
         if (move == '\n'){
-            handleChoice(timewin, notesubwin, highlight);
+            if(handleChoice(timewin, notesubwin,storedata, highlight))
+                return 3; //Had error
         }
+
     }
     return 0;
 }
 
-int reservationwindow(void) {
+
+
+
+// MAIN FUNCTION CALLER **************
+
+int appointmentwindow(void) {
 
     //CREATE MAIN WINDOW   ////START CURSES////
     int yMax = 0, xMax = 0;
-    WINDOW *timewin = createmainwin(&yMax, &xMax);
+    WINDOW *timewin = app_createmainwin(&yMax, &xMax);
     if (time == NULL){
         exit(EXIT_FAILURE);
     }
@@ -228,7 +237,7 @@ int reservationwindow(void) {
     }
 
     //MAIN LOOP FOR INPUT AND TIME AND HELPBAR.
-    int ret = mainloop(timewin, subwinn, xMax);
+    int ret = app_mainloop(timewin, subwinn,subwinc, xMax);
 
 
     delwin(subwinm);
@@ -241,3 +250,10 @@ int reservationwindow(void) {
     }
     return 0;
 }
+
+// ************************************************************************
+
+
+
+
+

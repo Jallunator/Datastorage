@@ -6,7 +6,7 @@
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 04:45:24 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/07 13:54:33 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/09 02:16:26 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ WINDOW *createmenuwin(void)
 int menuchoices(WINDOW *menuwin)
 {
     keypad(menuwin, TRUE); 
-    char    *choices[12] = {"Reservation","-----------","      ","About us"," --------  ","           ", "Help", " ----  ","   ", "Exit", "  ----   ","   "};
+    char    *choices[12] = {"Data Storage","------------","      ","About us"," --------  ","           ", "Help", " ----  ","   ", "Exit", "  ----   ","   "};
     int     choice;
     int highlight = 0;
 
@@ -128,7 +128,7 @@ void checkchoices(int choice)
         // use time() func to free times in time and others
         case 0:
         {
-            int x = reservationwindow(); // Here starts the reservation program. 
+            int x = appointmentwindow(); // Here starts the reservation program. 
             endwin();
             exit(EXIT_SUCCESS);
         }

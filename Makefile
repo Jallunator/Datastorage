@@ -1,5 +1,5 @@
 FLAGS = -Wall -Wextra -Werror
-SRCS = $(wildcard srcs/*.c srcs/DataStorage/*.c)
+SRCS = $(wildcard srcs/*.c srcs/DataStorage/mainW/*.c srcs/DataStorage/storeSearchData/*.c)
 OBJ  = $(SRCS:.c=.o)
 TARGET = exe
 

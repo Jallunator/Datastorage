@@ -15,6 +15,7 @@
 
 int main(void)
 {
+    student *root = NULL;
     //menuwin returns the choice
     menuwin();
 

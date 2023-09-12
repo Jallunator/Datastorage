@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   logic.c                                            :+:      :+:    :+:   */
+/*   Logic.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 12:50:54 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/09 03:31:27 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/12 18:58:15 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "hed.h"
-
+#include <curses.h>
 
 /*****************BOTTOM BAR START **/ 
 
@@ -48,7 +48,7 @@ void helpbar(WINDOW *timewin) {
 
 
 // NOTEPAD ******************************************
-void writenote(WINDOW *notewin)
+void writenote(WINDOW *notewin, WINDOW *timewin)
 {
     int yMax, xMax;
     static int x = 4;
@@ -57,7 +57,7 @@ void writenote(WINDOW *notewin)
     int ch;
     getmaxyx(notewin,yMax,xMax);
     keypad(notewin, TRUE); //Enabling specialkeys
-    char *exitmsg = "Enter to exit write mode";
+    char *exitmsg = "Enter: save     c: clear";
     mvwprintw(notewin, 1, xMax - strlen(exitmsg) - 2,"%s", exitmsg);
     echo();
 
@@ -82,7 +82,13 @@ void writenote(WINDOW *notewin)
         } 
         else if (ch == '\n'){
             break;  // Exit loop when Enter key is pressed
-        } 
+        }
+        else if (ch == 'c'){
+            freshScreen(notewin, timewin, 3, 0);
+            x = 4;
+           // mvwaddch(notewin, y, x - 1, ' ');
+            break;
+        }
         else{
             
             mvwaddch(notewin, y, x, ch);
@@ -107,19 +113,23 @@ void writenote(WINDOW *notewin)
 // MOVEMENT / LOGIC ***********************************************
 
 // CHOICES
-int handleChoice(WINDOW *timewin, WINDOW *notesubwin,WINDOW *datawindow, int highlight) {
-    
+int handleChoice(WINDOW *timewin, WINDOW *notesubwin,WINDOW *datawindow,WINDOW *middlew, int highlight, student *root) {
+    int xmax, ymax;
     switch (highlight) {
         case 0:
-            int x = storedata(datawindow, timewin);      // Here starts the datastoring part.
-            if (x) return x;
+            root = storeDataMain(datawindow, timewin, notesubwin, middlew);      // RETURNS PTR TO BST ROOT !
+            if (!(root)) return 3;   //Error check
+            wrefresh(datawindow);
+            app_mainloop(timewin, notesubwin, datawindow, middlew, root);
             break;
         case 1:
-        case 2:
+            searchDataMain(middlew, timewin, root);
+            getmaxyx(datawindow, ymax, xmax);
+            freshScreen(middlew, timewin, 2, xmax);
             break;
-        case 3:
+        case 2:
             wattron(notesubwin, COLOR_PAIR(2));
-            writenote(notesubwin);
+            writenote(notesubwin, timewin);
             wattroff(notesubwin, COLOR_PAIR(2));
             wrefresh(notesubwin);
             break;
@@ -134,7 +144,7 @@ void handleMovement(int *highlight, int move, int *ret) {
         case KEY_RIGHT:
         case 'l':
         case 'L':{
-            if (*highlight == 3) {
+            if (*highlight == 2) {
                 return;
             }
             *highlight += 1;
@@ -169,25 +179,26 @@ void handleMovement(int *highlight, int move, int *ret) {
 
 
 
-int app_mainloop(WINDOW *timewin,WINDOW *notesubwin,WINDOW *storedata,int xMax)
+int app_mainloop(WINDOW *timewin,WINDOW *notesubwin,WINDOW *storedata,WINDOW *middlew, student *root)
 {
     helpbar(timewin);
     keypad(timewin, TRUE);
     nodelay(timewin, TRUE);     /* Makes getch non blocking so time can be updated. Multithreading not possible in curses*/ 
     timeout(1000);
     int move;
-    int x;
+                //x = xMax / 2 - strlen(choices[i + 1]);
     int ret = 0;
     int highlight = 0;
-    char *choices[4] = {"[ Store data ]", "[ Search data ]", "[ Leave review ]", "[ Write notification ]"};
+    char *choices[3] = {"[ Store data ]", "[ Search data ]", "[ Write notification ]"};
+    int x;
 
     while (1) {
         move = wgetch(timewin); 
-        for (int i = 0 ; i < 4 ; i++){
+        for (int i = 0 ; i < 3 ; i++){
             if (i == highlight){
                 wattron(timewin, A_REVERSE);
             }
-            x = i * 54 + 24;
+            x = i * 55 + 25;
             wattron(timewin, COLOR_PAIR(1));
             mvwprintw(timewin, 29, x,"%s", choices[i]);
             wattroff(timewin, COLOR_PAIR(1));
@@ -199,7 +210,7 @@ int app_mainloop(WINDOW *timewin,WINDOW *notesubwin,WINDOW *storedata,int xMax)
 
         if (ret) return ret; // Q OR M
         if (move == '\n'){
-            if(handleChoice(timewin, notesubwin,storedata, highlight))
+            if(handleChoice(timewin, notesubwin,storedata,middlew, highlight, root))
                 return 3; //Had error
         }
 
@@ -213,11 +224,13 @@ int app_mainloop(WINDOW *timewin,WINDOW *notesubwin,WINDOW *storedata,int xMax)
 // MAIN FUNCTION CALLER **************
 
 int appointmentwindow(void) {
+    
 
+    student *studentroot = NULL;
     //CREATE MAIN WINDOW   ////START CURSES////
     int yMax = 0, xMax = 0;
     WINDOW *timewin = app_createmainwin(&yMax, &xMax);
-    if (time == NULL){
+    if (timewin == NULL){
         exit(EXIT_FAILURE);
     }
 
@@ -237,7 +250,7 @@ int appointmentwindow(void) {
     }
 
     //MAIN LOOP FOR INPUT AND TIME AND HELPBAR.
-    int ret = app_mainloop(timewin, subwinn,subwinc, xMax);
+    int ret = app_mainloop(timewin, subwinn,subwinc, subwinm, studentroot);
 
 
     delwin(subwinm);
@@ -248,6 +261,8 @@ int appointmentwindow(void) {
     if (ret == 2){
         menuwin();      //Pressed M and goes back to menu.
     }
+    //FREE MEM AFTER EXITING THE PROGRAM !
+    freeStudents(studentroot);
     return 0;
 }
 

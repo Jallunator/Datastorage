@@ -1,17 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   allWindows.c                                       :+:      :+:    :+:   */
+/*   CreateWindows.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Alex P <alexxpyykonen@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/07 14:00:00 by Alex P            #+#    #+#             */
-/*   Updated: 2023/09/09 03:58:19 by Alex P           ###   ########.fr       */
+/*   Updated: 2023/09/12 15:30:27 by Alex P           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "hed.h"
 
+//CREATES FRESHWINDOW**********************************************
+
+void freshScreen(WINDOW* datawindow, WINDOW *timewin, int which, int calwidth)  // w == window 1.first 2.middle 3. last
+{
+    int xmax, ymax;
+    wclear(datawindow);
+    getmaxyx(timewin, ymax, xmax);
+    if (which == 1)
+        subwincalendar(timewin, xmax, ymax, NULL);
+    else if (which == 2)
+            subwinmiddle(timewin, xmax, ymax, calwidth);
+    else if (which == 3)
+        subwinnote(timewin, xmax, ymax);
+
+    wrefresh(datawindow);
+}
+
+
+//**********************WINDOWS***********
+
+//MAINWINDOW-----------------
 WINDOW *app_createmainwin(int *xMax, int *yMax) {
     initscr();
     noecho();
@@ -42,6 +63,7 @@ WINDOW *app_createmainwin(int *xMax, int *yMax) {
     return timewin;
 }
 
+//SUBWINDOWS ------------------------------------------------
 WINDOW *subwincalendar(WINDOW* parent, int xMax, int yMax, int *calwidth) {
     (void)yMax;
 

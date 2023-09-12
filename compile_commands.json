@@ -1,0 +1,86 @@
+[
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/helpwindow.c",
+   "-o",
+   "srcs/helpwindow.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/helpwindow.c"
+ },
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/main.c",
+   "-o",
+   "srcs/main.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/main.c"
+ },
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/menu.c",
+   "-o",
+   "srcs/menu.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/menu.c"
+ },
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/DataStorage/allWindows.c",
+   "-o",
+   "srcs/DataStorage/allWindows.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/DataStorage/allWindows.c"
+ },
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/DataStorage/logic.c",
+   "-o",
+   "srcs/DataStorage/logic.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/DataStorage/logic.c"
+ },
+ {
+  "directory": "/home/alex/C_Coding/C_Projects/C_BigProjects/TicketSystem",
+  "arguments": [
+   "gcc",
+   "-c",
+   "srcs/DataStorage/storedata.c",
+   "-o",
+   "srcs/DataStorage/storedata.o",
+   "-lncurses",
+   "-I",
+   "includes"
+  ],
+  "file": "srcs/DataStorage/storedata.c"
+ }
+]

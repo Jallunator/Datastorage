@@ -6,7 +6,7 @@ This program uses ncurses to create a Text User Interface (TUI) inside the termi
 
 <div style="display: flex; flex-direction: row;">
   <div style="text-align: center;">
-    <img src="assets/menu.png" alt="Menu" style="width: 100%;" />
+    <img src="assets/menu.png" alt="Menu" style="width: 50%;" />
     <p>Menu</p>
   </div>
   <div style="text-align: center;">
